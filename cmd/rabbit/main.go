@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -19,6 +20,17 @@ func main() {
 			Usage:  "Load configuration from `FILE`",
 			Value:  "./config.json",
 			EnvVar: "RABBIT_CONFIG_FILE",
+		},
+	}
+	app.Commands = []cli.Command{
+		cli.Command{
+			Name:        "version",
+			Usage:       "",
+			Description: "Prints the version",
+			Action: func(c *cli.Context) error {
+				fmt.Println(rabbit.Version)
+				return nil
+			},
 		},
 	}
 	app.Action = func(c *cli.Context) error {
