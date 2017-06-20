@@ -1,0 +1,67 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"path": "appengine",
+			"revision": ""
+		},
+		{
+			"path": "appengine/urlfetch",
+			"revision": ""
+		},
+		{
+			"path": "appengine/user",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "eQ+gL3v8Ch94ruC6ZpFxjS8idKY=",
+			"path": "github.com/bugsnag/bugsnag-go",
+			"revision": "70e1420b037f5c364d18f5a7c9a39e8304230f32",
+			"revisionTime": "2017-02-21T00:03:32Z"
+		},
+		{
+			"checksumSHA1": "M34Z900ntGlIegOmR5qcb/b3th0=",
+			"path": "github.com/bugsnag/bugsnag-go/errors",
+			"revision": "70e1420b037f5c364d18f5a7c9a39e8304230f32",
+			"revisionTime": "2017-02-21T00:03:32Z"
+		},
+		{
+			"checksumSHA1": "5PHdeMyN9q+GZ53CbqXCAYKOTOM=",
+			"path": "github.com/bugsnag/panicwrap",
+			"revision": "8a46439dfbe67eb75ff5401f421d4538c3fb237f",
+			"revisionTime": "2017-06-15T23:56:21Z"
+		},
+		{
+			"checksumSHA1": "7/KNulGXRsKu2MMDR2LjCCZ1LKg=",
+			"path": "github.com/jmshal/wsutil",
+			"revision": "b83ce27cc066e55e4bc1fcea30e7a36baa97f169",
+			"revisionTime": "2017-06-20T21:51:17Z"
+		},
+		{
+			"checksumSHA1": "gEjGS03N1eysvpQ+FCHTxPcbxXc=",
+			"path": "github.com/kardianos/osext",
+			"revision": "ae77be60afb1dcacde03767a8c37337fad28ac14",
+			"revisionTime": "2017-05-10T13:15:34Z"
+		},
+		{
+			"checksumSHA1": "6JP37UqrI0H80Gpk0Y2P+KXgn5M=",
+			"path": "github.com/ryanuber/go-glob",
+			"revision": "256dc444b735e061061cf46c809487313d5b0065",
+			"revisionTime": "2017-01-28T01:21:29Z"
+		},
+		{
+			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
+			"path": "github.com/satori/go.uuid",
+			"revision": "5bf94b69c6b68ee1b541973bb8e1144db23a194b",
+			"revisionTime": "2017-03-21T23:07:31Z"
+		},
+		{
+			"checksumSHA1": "brhONOPp4CSdTZf5uEtcH+FpFUI=",
+			"path": "gopkg.in/urfave/cli.v1",
+			"revision": "0bdeddeeb0f650497d603c4ad7b20cfe685682f6",
+			"revisionTime": "2016-11-22T04:36:10Z"
+		}
+	],
+	"rootPath": "github.com/jmshal/rabbit"
+}

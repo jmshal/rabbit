@@ -1,0 +1,35 @@
+package main
+
+import (
+	"log"
+	"os"
+
+	"github.com/jmshal/rabbit/rabbit"
+	cli "gopkg.in/urfave/cli.v1"
+)
+
+func main() {
+	app := cli.NewApp()
+	app.Name = "rabbit"
+	app.Usage = ""
+	app.Version = rabbit.Version
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:   "config, c",
+			Usage:  "Load configuration from `FILE`",
+			Value:  "./config.json",
+			EnvVar: "RABBIT_CONFIG_FILE",
+		},
+	}
+	app.Action = func(c *cli.Context) error {
+		configPath := c.String("config")
+		config, err := rabbit.LoadConfigFile(configPath)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		app := rabbit.NewRabbit(config)
+		log.Fatalln(app.Listen())
+		return nil
+	}
+	app.Run(os.Args)
+}

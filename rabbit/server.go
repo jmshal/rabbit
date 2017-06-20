@@ -1,0 +1,52 @@
+package rabbit
+
+import (
+	"net/http"
+	"net/http/httputil"
+	"strconv"
+
+	bugsnag "github.com/bugsnag/bugsnag-go"
+	"github.com/jmshal/wsutil"
+)
+
+func (a *Rabbit) handleRequest(w http.ResponseWriter, r *http.Request) {
+	match, err := a.FindRoute(r)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	endpoint, err := a.NextEndpoint(match.Route)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	var proxy http.Handler
+
+	if wsutil.IsWebSocketRequest(r) {
+		proxy = &wsutil.ReverseProxy{
+			Director: func(r *http.Request) {
+				a.TransformRequest(r, match.Entrypoint, *endpoint)
+			},
+			// TODO somehow add support for ModifyResponse
+		}
+	} else {
+		proxy = &httputil.ReverseProxy{
+			Director: func(r *http.Request) {
+				a.TransformRequest(r, match.Entrypoint, *endpoint)
+			},
+			ModifyResponse: func(res *http.Response) error {
+				return a.TransformResponse(res)
+			},
+		}
+	}
+
+	proxy.ServeHTTP(w, r)
+}
+
+func (a *Rabbit) Listen() error {
+	port := ":" + strconv.Itoa(int(a.config.Server.Port))
+	handler := bugsnag.Handler(a.server)
+	return http.ListenAndServe(port, handler)
+}
