@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 
 	"github.com/jmshal/rabbit/rabbit"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	app := cli.NewApp()
 	app.Name = "rabbit"
 	app.Usage = ""
