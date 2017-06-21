@@ -1,0 +1,41 @@
+{
+  "server": {
+    "port": 8080,
+    "tls": true
+  },
+  "tls": [
+    {
+      "key": "./certs/localhost/key.pem",
+      "cert": "./certs/localhost/cert.pem"
+    }
+  ],
+  "routes": [
+    {
+      "entrypoints": [
+        {
+          "path": "/first"
+        }
+      ],
+      "endpoints": [
+        {
+          "host": "localhost",
+          "port": 3000
+        }
+      ]
+    },
+    {
+      "entrypoints": [
+        {
+          "path": "/second"
+        }
+      ],
+      "endpoints": [
+        {
+          "host": "localhost",
+          "port": 5000,
+          "origin": "localhost:5000"
+        }
+      ]
+    }
+  ]
+}
