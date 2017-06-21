@@ -7,6 +7,11 @@ if [ -d ./bin ]; then
     rm -rf ./bin/*
 fi
 
+if [ -d ./vendor ]; then
+    echo "Cleaning vendor directory..."
+    rm -rf ./vendor/*/
+fi
+
 echo "Installing dependencies..."
 govendor sync
 
