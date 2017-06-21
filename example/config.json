@@ -36,6 +36,19 @@
           "origin": "localhost:5000"
         }
       ]
+    },
+    {
+      "entrypoints": [
+        {
+          "path": "/ws"
+        }
+      ],
+      "endpoints": [
+        {
+          "host": "localhost",
+          "port": 9000
+        }
+      ]
     }
   ]
 }
