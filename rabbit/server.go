@@ -3,9 +3,7 @@ package rabbit
 import (
 	"net/http"
 	"net/http/httputil"
-	"strconv"
 
-	bugsnag "github.com/bugsnag/bugsnag-go"
 	"github.com/jmshal/wsutil"
 )
 
@@ -46,7 +44,9 @@ func (a *Rabbit) handleRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Rabbit) Listen() error {
-	port := ":" + strconv.Itoa(int(a.config.Server.Port))
-	handler := bugsnag.Handler(a.server)
-	return http.ListenAndServe(port, handler)
+	if a.config.Server.TLS {
+		return a.listenTLS()
+	} else {
+		return a.listenHTTP()
+	}
 }

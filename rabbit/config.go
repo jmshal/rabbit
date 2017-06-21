@@ -10,12 +10,18 @@ import (
 )
 
 type config struct {
-	Routes  []route `json:"routes"`
-	Server  server  `json:"server"`
-	Bugsnag bs      `json:"bugsnag"`
+	Routes  []route  `json:"routes"`
+	Server  server   `json:"server"`
+	Bugsnag bugsnag_ `json:"bugsnag"`
+	TLS     []tls_   `json:"tls"`
 }
 
-type bs struct {
+type tls_ struct {
+	Cert string `json:"cert"`
+	Key  string `json:"key"`
+}
+
+type bugsnag_ struct {
 	APIKey       string `json:"apiKey"`
 	ReleaseStage string `json:"releaseStage"`
 	Endpoint     string `json:"endpoint"`
@@ -42,6 +48,7 @@ type endpoint struct {
 
 type server struct {
 	Port uint16 `json:"port"`
+	TLS  bool   `json:"tls"`
 }
 
 func (c *config) applyDefaults() {
