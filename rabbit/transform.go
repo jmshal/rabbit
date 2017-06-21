@@ -6,11 +6,15 @@ import (
 	"strconv"
 	"strings"
 
+	"net"
+
 	uuid "github.com/satori/go.uuid"
 )
 
 const (
 	requestIDHeader = "X-Request-Id"
+	xForwardedProto = "X-Forwarded-Proto"
+	xForwardedPort  = "X-Forwarded-Port"
 )
 
 var (
@@ -22,6 +26,16 @@ var (
 )
 
 func (a *Rabbit) TransformRequest(r *http.Request, entrypoint entrypoint, endpoint endpoint) error {
+	if r.TLS != nil {
+		r.Header.Add(xForwardedProto, "https")
+	} else {
+		r.Header.Add(xForwardedProto, "http")
+	}
+
+	if _, port, err := net.SplitHostPort(r.Host); err == nil {
+		r.Header.Add(xForwardedPort, port)
+	}
+
 	if endpoint.Origin != "" {
 		r.Host = endpoint.Origin
 	}
@@ -49,11 +63,8 @@ func (a *Rabbit) TransformRequest(r *http.Request, entrypoint entrypoint, endpoi
 }
 
 func (a *Rabbit) TransformResponse(r *http.Response) error {
-	requestID := r.Request.Header.Get(requestIDHeader)
 	for _, header := range removeHeaders {
 		r.Header.Del(header)
 	}
-	r.Header.Set("Server", "rabbit")
-	r.Header.Set(requestIDHeader, requestID)
 	return nil
 }

@@ -11,12 +11,12 @@ import (
 
 type config struct {
 	Routes  []route  `json:"routes"`
-	Server  server   `json:"server"`
+	Ports   ports    `json:"ports"`
 	Bugsnag bugsnag_ `json:"bugsnag"`
-	TLS     []tls_   `json:"tls"`
+	Certs   []certs  `json:"certs"`
 }
 
-type tls_ struct {
+type certs struct {
 	Cert string `json:"cert"`
 	Key  string `json:"key"`
 }
@@ -46,14 +46,14 @@ type endpoint struct {
 	Origin   string `json:"origin"`
 }
 
-type server struct {
-	Port uint16 `json:"port"`
-	TLS  bool   `json:"tls"`
+type ports struct {
+	HTTP  uint16 `json:"http"`
+	HTTPS uint16 `json:"https"`
 }
 
 func (c *config) applyDefaults() {
-	if c.Server.Port == 0 {
-		var port int
+	if c.Ports.HTTP == 0 {
+		port := 80
 		for _, name := range []string{
 			"PORT",
 			"HTTP_PLATFORM_PORT",
@@ -63,7 +63,10 @@ func (c *config) applyDefaults() {
 				break
 			}
 		}
-		c.Server.Port = uint16(port)
+		c.Ports.HTTP = uint16(port)
+	}
+	if c.Ports.HTTPS == 0 && len(c.Certs) > 0 {
+		c.Ports.HTTPS = 443
 	}
 }
 

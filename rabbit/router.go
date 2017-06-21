@@ -24,9 +24,6 @@ func (a *Rabbit) FindRoute(r *http.Request) (*RouteMatch, error) {
 		return nil, err
 	}
 
-	a.mux.Lock()
-	defer a.mux.Unlock()
-
 	for _, route := range a.config.Routes {
 		for _, entrypoint := range route.Entrypoints {
 			if entrypoint.Host != "" &&

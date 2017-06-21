@@ -1,9 +1,9 @@
 {
-  "server": {
-    "port": 8080,
-    "tls": true
+  "ports": {
+    "http": 1080,
+    "https": 10443
   },
-  "tls": [
+  "certs": [
     {
       "key": "./certs/localhost/key.pem",
       "cert": "./certs/localhost/cert.pem"

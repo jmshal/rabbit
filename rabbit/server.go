@@ -42,11 +42,3 @@ func (a *Rabbit) handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	proxy.ServeHTTP(w, r)
 }
-
-func (a *Rabbit) Listen() error {
-	if a.config.Server.TLS {
-		return a.listenTLS()
-	} else {
-		return a.listenHTTP()
-	}
-}
