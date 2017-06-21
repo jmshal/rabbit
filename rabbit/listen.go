@@ -26,19 +26,9 @@ func (a *Rabbit) listenTLS() error {
 	_, port, handler := getPortsAndHandler(a)
 
 	config := &tls.Config{
-		MinVersion: tls.VersionTLS12,
-		CurvePreferences: []tls.CurveID{
-			tls.CurveP521,
-			tls.CurveP384,
-			tls.CurveP256,
-		},
+		MinVersion:               tls.VersionTLS12,
 		PreferServerCipherSuites: true,
-		CipherSuites: []uint16{
-			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
-		},
+		NextProtos:               []string{"h2", "h2-14", "http/1.1"},
 	}
 
 	var err error
@@ -53,10 +43,9 @@ func (a *Rabbit) listenTLS() error {
 	config.BuildNameToCertificate()
 
 	server := &http.Server{
-		Addr:         port,
-		Handler:      handler,
-		TLSConfig:    config,
-		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
+		Addr:      port,
+		Handler:   handler,
+		TLSConfig: config,
 	}
 
 	conn, err := net.Listen("tcp", server.Addr)
