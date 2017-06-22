@@ -28,7 +28,7 @@ func (a *Rabbit) listenTLS() error {
 	config := &tls.Config{
 		MinVersion:               tls.VersionTLS12,
 		PreferServerCipherSuites: true,
-		NextProtos:               []string{"h2", "h2-14", "http/1.1"},
+		NextProtos:               []string{"h2", "http/1.1"},
 	}
 
 	var err error
