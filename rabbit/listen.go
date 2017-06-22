@@ -2,7 +2,6 @@ package rabbit
 
 import (
 	"crypto/tls"
-	"log"
 	"net"
 	"net/http"
 	"strconv"
@@ -34,6 +33,7 @@ func (a *Rabbit) listenTLS() error {
 	var err error
 	config.Certificates = make([]tls.Certificate, len(a.config.Certs))
 	for index, cert := range a.config.Certs {
+		a.Logger().Printf("loading tls certificate (%v, %v)", cert.Cert, cert.Key)
 		config.Certificates[index], err = tls.LoadX509KeyPair(cert.Cert, cert.Key)
 		if err != nil {
 			return err
@@ -61,12 +61,12 @@ func (a *Rabbit) Listen() error {
 	errs := make(chan error)
 	if a.config.Ports.HTTPS != 0 {
 		go func() {
-			log.Printf("Listening tls server on :%v", a.config.Ports.HTTPS)
+			a.Logger().Printf("listening https on :%v", a.config.Ports.HTTPS)
 			errs <- a.listenTLS()
 		}()
 	}
 	go func() {
-		log.Printf("Listening http server on :%v", a.config.Ports.HTTP)
+		a.Logger().Printf("listening http on :%v", a.config.Ports.HTTP)
 		errs <- a.listenHTTP()
 	}()
 	return <-errs

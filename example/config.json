@@ -1,4 +1,5 @@
 {
+  "debug": true,
   "ports": {
     "http": 1080,
     "https": 10443

@@ -10,6 +10,7 @@ import (
 )
 
 type config struct {
+	Debug   bool     `json:"debug"`
 	Routes  []route  `json:"routes"`
 	Ports   ports    `json:"ports"`
 	Bugsnag bugsnag_ `json:"bugsnag"`
