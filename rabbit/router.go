@@ -24,8 +24,25 @@ func (a *Rabbit) FindRoute(r *http.Request) (*RouteMatch, error) {
 		return nil, err
 	}
 
-	for _, route := range a.config.Routes {
+	method := strings.ToUpper(r.Method)
+	if method == "" {
+		method = "GET"
+	}
+
+	for index, route := range a.config.Routes {
 		for _, entrypoint := range route.Entrypoints {
+			if len(entrypoint.Methods) > 0 {
+				allow := false
+				for _, verb := range entrypoint.Methods {
+					if strings.ToUpper(verb) == method {
+						allow = true
+						break
+					}
+				}
+				if !allow {
+					continue
+				}
+			}
 			if entrypoint.Host != "" &&
 				!glob.Glob(entrypoint.Host, host) {
 				continue

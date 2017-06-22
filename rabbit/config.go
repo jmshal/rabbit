@@ -33,9 +33,10 @@ type route struct {
 }
 
 type entrypoint struct {
-	Host string `json:"host"`
-	Port uint16 `json:"port"`
-	Path string `json:"path"`
+	Methods []string `json:"methods"`
+	Host    string   `json:"host"`
+	Port    uint16   `json:"port"`
+	Path    string   `json:"path"`
 }
 
 type endpoint struct {
