@@ -10,12 +10,14 @@ import (
 func (a *Rabbit) handleRequest(w http.ResponseWriter, r *http.Request) {
 	match, err := a.FindRoute(r)
 	if err != nil {
+		a.Logger().Println(err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	endpoint, err := a.NextEndpoint(match.Route)
 	if err != nil {
+		a.Logger().Println(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
