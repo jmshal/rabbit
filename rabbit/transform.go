@@ -1,12 +1,11 @@
 package rabbit
 
 import (
+	"net"
 	"net/http"
 	"path"
 	"strconv"
 	"strings"
-
-	"net"
 
 	uuid "github.com/satori/go.uuid"
 )
@@ -20,6 +19,7 @@ const (
 var (
 	removeHeaders = []string{
 		"Server",
+		"Via",
 		"X-Powered-By",
 		"X-AspNet-Version",
 	}
@@ -59,6 +59,7 @@ func (a *Rabbit) TransformRequest(r *http.Request, entrypoint entrypoint, endpoi
 		r.Header.Set(requestIDHeader, requestID)
 	}
 
+	a.Logger().Printf("-> %v %v %v", r.Method, r.Host, r.URL.Path)
 	return nil
 }
 

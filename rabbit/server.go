@@ -42,5 +42,6 @@ func (a *Rabbit) handleRequest(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	a.Logger().Printf("<- %v %v %v", r.Method, r.Host, r.URL.Path)
 	proxy.ServeHTTP(w, r)
 }
