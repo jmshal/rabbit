@@ -29,7 +29,7 @@ func (a *Rabbit) FindRoute(r *http.Request) (*RouteMatch, error) {
 		method = "GET"
 	}
 
-	for index, route := range a.config.Routes {
+	for _, route := range a.config.Routes {
 		for _, entrypoint := range route.Entrypoints {
 			if len(entrypoint.Methods) > 0 {
 				allow := false
