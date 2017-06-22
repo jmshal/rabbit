@@ -3,9 +3,14 @@ package rabbit
 import (
 	"net"
 	"strconv"
+	"strings"
 )
 
 func parseHostPort(hostPort string) (string, uint16, error) {
+	if strings.Index(hostPort, ":") == -1 {
+		return hostPort, 0, nil
+	}
+
 	host, portString, err := net.SplitHostPort(hostPort)
 
 	if err != nil {
