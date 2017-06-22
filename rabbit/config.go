@@ -93,11 +93,14 @@ func LoadConfigFile(path string) (*config, error) {
 	return LoadConfigString(string(file))
 }
 
-func (c *config) configureBugsnag() {
-	bugsnag.Configure(bugsnag.Configuration{
-		APIKey:       c.Bugsnag.APIKey,
-		ReleaseStage: c.Bugsnag.ReleaseStage,
-		Endpoint:     c.Bugsnag.Endpoint,
-		AppVersion:   Version,
-	})
+func (a *Rabbit) configureBugsnag() {
+	if a.config.Bugsnag.APIKey != "" {
+		a.Logger().Println("configuring bugsnag")
+		bugsnag.Configure(bugsnag.Configuration{
+			APIKey:       a.config.Bugsnag.APIKey,
+			ReleaseStage: a.config.Bugsnag.ReleaseStage,
+			Endpoint:     a.config.Bugsnag.Endpoint,
+			AppVersion:   Version,
+		})
+	}
 }

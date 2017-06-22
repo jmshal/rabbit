@@ -14,7 +14,7 @@ func NewRabbit(config *config) *Rabbit {
 		config: config,
 		mux:    http.NewServeMux(),
 	}
-	app.config.configureBugsnag()
+	app.configureBugsnag()
 	app.mux.HandleFunc("/", app.handleRequest)
 	return app
 }
