@@ -3,7 +3,6 @@ package rabbit
 import (
 	"net"
 	"net/http"
-	"path"
 	"strconv"
 	"strings"
 
@@ -52,7 +51,7 @@ func (a *Rabbit) TransformRequest(r *http.Request, entrypoint entrypoint, endpoi
 	}
 
 	strippedPath := "/" + strings.TrimPrefix(r.URL.Path, entrypoint.Path)
-	r.URL.Path = path.Clean("/" + endpoint.Path + strippedPath)
+	r.URL.Path = endpoint.Path + strippedPath
 
 	if requestID := r.Header.Get(requestIDHeader); requestID == "" {
 		requestID = uuid.NewV4().String()
