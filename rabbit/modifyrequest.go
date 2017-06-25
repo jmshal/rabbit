@@ -3,13 +3,19 @@ package rabbit
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 )
 
 const (
-	RequestID       = "X-Request-Id"
-	XForwardedProto = "X-Forwarded-Proto"
-	XForwardedPort  = "X-Forwarded-Port"
+	RequestID        = "X-Request-Id"
+	XForwardedProto  = "X-Forwarded-Proto"
+	XForwardedPort   = "X-Forwarded-Port"
+	XForwardedServer = "X-Forwarded-Server"
+)
+
+var (
+	hostname = ""
 )
 
 func (a *rabbit) ModifyRequest(r *http.Request) error {
@@ -19,6 +25,10 @@ func (a *rabbit) ModifyRequest(r *http.Request) error {
 	r.Header.Set(RequestID, info.ID)
 	r.Header.Add(XForwardedProto, info.URL.Scheme)
 	r.Header.Add(XForwardedPort, info.URL.Port())
+
+	if hostname != "" {
+		r.Header.Add(XForwardedServer, hostname)
+	}
 
 	if endpoint.Origin != "" {
 		r.Host = endpoint.Origin
@@ -59,4 +69,8 @@ func (a *rabbit) ModifyRequest(r *http.Request) error {
 	r.URL.Path = path
 
 	return nil
+}
+
+func init() {
+	hostname, _ = os.Hostname()
 }
