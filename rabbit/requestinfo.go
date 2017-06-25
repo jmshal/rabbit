@@ -22,9 +22,9 @@ type RequestInfo struct {
 
 func TagRequestInfo(r *http.Request) (*http.Request, *RequestInfo) {
 	var id string
-	if id = r.Header.Get(RequestID); id == "" {
-		id = uuid.NewV4().String()
-	}
+	// if id = r.Header.Get(RequestID); id == "" {
+	id = uuid.NewV4().String()
+	// }
 	u := getRequestURL(r)
 	m := &RequestInfo{
 		ID:        id,
