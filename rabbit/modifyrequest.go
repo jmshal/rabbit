@@ -43,13 +43,19 @@ func (a *rabbit) ModifyRequest(r *http.Request) error {
 		r.URL.Host += fmt.Sprintf(":%v", endpoint.Port)
 	}
 
-	// TODO below, sort out retaining path without allowing path hijacking
-	path := "/"
-	path += strings.TrimLeft(endpoint.Path, "/")
-	if !strings.HasSuffix(path, "/") {
-		path += "/"
+	parts := []string{
+		endpoint.Path, // start with the endpoint path
+		strings.TrimPrefix(r.URL.Path, info.Match.Entrypoint.Path), // add the unprefixed entrypoint path
 	}
-	path += strings.TrimLeft(strings.TrimPrefix(r.URL.Path, info.Match.Entrypoint.Path), "/")
+	var path string
+	for _, part := range parts {
+		if part != "" && part != "/" {
+			path += "/" + strings.TrimLeft(part, "/")
+		}
+	}
+	if path == "" {
+		path = "/"
+	}
 	r.URL.Path = path
 
 	return nil
