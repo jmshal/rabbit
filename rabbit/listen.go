@@ -2,49 +2,65 @@ package rabbit
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net"
 	"net/http"
-	"strconv"
-
-	bugsnag "github.com/bugsnag/bugsnag-go"
 )
 
-func getPortsAndHandler(a *Rabbit) (http string, https string, handler http.Handler) {
-	http = ":" + strconv.Itoa(int(a.config.Ports.HTTP))
-	https = ":" + strconv.Itoa(int(a.config.Ports.HTTPS))
-	handler = bugsnag.Handler(a.mux)
-	return
+func (a *rabbit) Listen() (err error) {
+	select {
+	case err = <-a.ListenHTTP():
+		return
+	case err = <-a.ListenHTTPS():
+		return
+	}
 }
 
-func (a *Rabbit) listenHTTP() error {
-	port, _, handler := getPortsAndHandler(a)
-	return http.ListenAndServe(port, handler)
+func (a *rabbit) ListenHTTP() <-chan error {
+	e := make(chan error)
+	go func() {
+		port := fmt.Sprintf(":%v", a.config.Ports.HTTP)
+		a.Log("listening http on %v", port)
+		e <- http.ListenAndServe(port, a)
+	}()
+	return e
 }
 
-func (a *Rabbit) listenTLS() error {
-	_, port, handler := getPortsAndHandler(a)
+func (a *rabbit) ListenHTTPS() <-chan error {
+	e := make(chan error)
+	if a.config.Ports.HTTPS != 0 && len(a.config.Certs) > 0 {
+		go func() {
+			port := fmt.Sprintf(":%v", a.config.Ports.HTTPS)
+			a.Log("listening https on %v", port)
+			e <- a.listenHTTPS(port)
+		}()
+	} else {
+		a.Log("https/certs not configured")
+	}
+	return e
+}
 
+func (a *rabbit) listenHTTPS(port string) error {
 	config := &tls.Config{
 		MinVersion:               tls.VersionTLS12,
 		PreferServerCipherSuites: true,
 		NextProtos:               []string{"h2", "http/1.1"},
 	}
 
-	var err error
-	config.Certificates = make([]tls.Certificate, len(a.config.Certs))
-	for index, cert := range a.config.Certs {
-		a.Logger().Printf("loading tls certificate (%v, %v)", cert.Cert, cert.Key)
-		config.Certificates[index], err = tls.LoadX509KeyPair(cert.Cert, cert.Key)
+	for _, cert := range a.config.Certs {
+		a.Log("loading tls certificate (%v, %v)", cert.Cert, cert.Key)
+		kp, err := tls.LoadX509KeyPair(cert.Cert, cert.Key)
 		if err != nil {
 			return err
 		}
+		config.Certificates = append(config.Certificates, kp)
 	}
 
 	config.BuildNameToCertificate()
 
 	server := &http.Server{
 		Addr:      port,
-		Handler:   handler,
+		Handler:   a,
 		TLSConfig: config,
 	}
 
@@ -55,19 +71,4 @@ func (a *Rabbit) listenTLS() error {
 
 	listener := tls.NewListener(conn, config)
 	return server.Serve(listener)
-}
-
-func (a *Rabbit) Listen() error {
-	errs := make(chan error)
-	if a.config.Ports.HTTPS != 0 {
-		go func() {
-			a.Logger().Printf("listening https on :%v", a.config.Ports.HTTPS)
-			errs <- a.listenTLS()
-		}()
-	}
-	go func() {
-		a.Logger().Printf("listening http on :%v", a.config.Ports.HTTP)
-		errs <- a.listenHTTP()
-	}()
-	return <-errs
 }

@@ -41,7 +41,23 @@
     {
       "entrypoints": [
         {
-          "path": "/ws"
+          "path": "/headers"
+        }
+      ],
+      "endpoints": [
+        {
+          "scheme": "https",
+          "host": "httpbin.org",
+          "origin": "httpbin.org",
+          "path": "/headers"
+        }
+      ]
+    },
+    {
+      "entrypoints": [
+        {
+          "path": "/ws",
+          "websockets": true
         }
       ],
       "endpoints": [

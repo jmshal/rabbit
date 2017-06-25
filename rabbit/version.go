@@ -1,5 +1,5 @@
 package rabbit
 
 const (
-	Version = "1.0.4-dev"
+	Version = "2.0.0-dev"
 )

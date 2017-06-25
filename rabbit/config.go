@@ -3,105 +3,164 @@ package rabbit
 import (
 	"encoding/json"
 	"io/ioutil"
-	"os"
-	"strconv"
-
-	bugsnag "github.com/bugsnag/bugsnag-go"
 )
 
 type config struct {
-	Debug   bool     `json:"debug"`
-	Routes  []route  `json:"routes"`
-	Ports   ports    `json:"ports"`
-	Bugsnag bugsnag_ `json:"bugsnag"`
-	Certs   []certs  `json:"certs"`
+	Debug    bool      `json:"debug"`
+	Ports    *Ports    `json:"ports"`
+	Certs    []*Cert   `json:"certs"`
+	Routes   []*Route  `json:"routes"`
+	Logging  *Logging  `json:"logging"`
+	Database *Database `json:"database"`
 }
 
-type certs struct {
+type Ports struct {
+	HTTP  int `json:"http"`
+	HTTPS int `json:"https"`
+}
+
+type Cert struct {
 	Cert string `json:"cert"`
 	Key  string `json:"key"`
 }
 
-type bugsnag_ struct {
-	APIKey       string `json:"apiKey"`
+type Route struct {
+	Entrypoints []*Entrypoint  `json:"entrypoints"`
+	Endpoints   []*Endpoint    `json:"endpoints"`
+	Caches      []*CachePolicy `json:"caches"`
+}
+
+type Entrypoint struct {
+	Secure     bool     `json:"secure"`     // upgrades non-https requests to https
+	Websockets bool     `json:"websockets"` // default: disable websockets
+	Methods    []string `json:"methods"`
+	Host       string   `json:"host"`
+	Path       string   `json:"path"`
+}
+
+type Endpoint struct {
+	Scheme string `json:"scheme"` // default http
+	Host   string `json:"host"`
+	Port   int    `json:"port"`
+	Path   string `json:"path"`
+	Origin string `json:"origin"`
+}
+
+type Logging struct {
+	AppInsights *AppInsights `json:"appInsights"`
+	Bugsnag     *Bugsnag     `json:"bugsnag"`
+}
+
+type AppInsights struct {
+	InstrumentationKey string `json:"instrumentationKey"`
+}
+
+type Bugsnag struct {
+	Key          string `json:"apiKey"`
 	ReleaseStage string `json:"releaseStage"`
 	Endpoint     string `json:"endpoint"`
 }
 
-type route struct {
-	Entrypoints []entrypoint `json:"entrypoints"`
-	Endpoints   []endpoint   `json:"endpoints"`
+type CachePolicy struct {
+	Match  string `json:"match"` // glob matcher string (full url)
+	TTL    int    `json:"ttl"`
+	Search bool   `json:"search"` // include search string in cache id
 }
 
-type entrypoint struct {
-	Methods []string `json:"methods"`
-	Host    string   `json:"host"`
-	Port    uint16   `json:"port"`
-	Path    string   `json:"path"`
+type Database struct {
+	Redis *Redis `json:"redis"`
 }
 
-type endpoint struct {
-	Protocol string `json:"protocol"`
-	Host     string `json:"host"`
-	Port     uint16 `json:"port"`
-	Path     string `json:"path"`
-	Origin   string `json:"origin"`
+type Redis struct {
+	URL string `json:"url"`
 }
 
-type ports struct {
-	HTTP  uint16 `json:"http"`
-	HTTPS uint16 `json:"https"`
+func (c *config) ApplyDefaults() {
+	c.Debug = false
+	c.Ports = &Ports{
+		HTTP: 80,
+	}
+	c.Certs = make([]*Cert, 0)
+	c.Routes = make([]*Route, 0)
+	c.Logging = &Logging{}
+	c.Database = &Database{}
 }
 
-func (c *config) applyDefaults() {
-	if c.Ports.HTTP == 0 {
-		port := 80
-		for _, name := range []string{
-			"PORT",
-			"HTTP_PLATFORM_PORT",
-		} {
-			if env := os.Getenv(name); env != "" {
-				port, _ = strconv.Atoi(env)
-				break
-			}
+func NewConfig() *config {
+	c := &config{}
+	c.ApplyDefaults()
+	return c
+}
+
+func NewConfigFromFile(path string) (*config, error) {
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	c := NewConfig()
+	err = json.Unmarshal(b, c)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+/*
+
+{
+	"database": {
+		"redis": {
+			"url": "tcp://redis:6379"
 		}
-		c.Ports.HTTP = uint16(port)
-	}
-	if c.Ports.HTTPS == 0 && len(c.Certs) > 0 {
-		c.Ports.HTTPS = 443
-	}
+	},
+	"logging": {
+		"appInsights": {
+			"instrumentationKey": "..."
+		},
+		"bugsnag": {
+			"apiKey": "...",
+			"releaseStage": "production"
+		}
+	},
+	"ports": {
+		"http": 80,
+		"https": 443
+	},
+	"certs": [{
+		"cert": "/run/secrets/example.com.crt",
+		"key": "/run/secrets/example.com.key"
+	}],
+	"routes": [
+		{
+			"entrypoints": [{
+				"secure": true,
+				"host": "example.com",
+				"path": "/blog"
+			}],
+			"endpoints": [{
+				"scheme": "https",
+				"host": "wordpress", // assume docker overlay network, and "wordpress" is the hostname
+				"path": "/"
+			}],
+			"caches": [{
+				"match": "*\/wp-content/*", // whole url matching
+				"ttl": 3600, // 1 hour ttl
+				"search": false
+			}]
+		},
+		{
+			"entrypoints": [{
+				"secure": true,
+				"host": "example.com",
+				"path": "/"
+			}],
+			"endpoints": [{
+				"scheme": "https",
+				"host": "homepage", // same as above
+				"path": "/"
+			}]
+		}
+	]
 }
 
-func LoadConfigString(text string) (*config, error) {
-	var config config
-	config.applyDefaults()
-
-	err := json.Unmarshal([]byte(text), &config)
-	if err != nil {
-		return nil, err
-	}
-
-	return &config, nil
-}
-
-func LoadConfigFile(path string) (*config, error) {
-	file, err := ioutil.ReadFile(path)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return LoadConfigString(string(file))
-}
-
-func (a *Rabbit) configureBugsnag() {
-	if a.config.Bugsnag.APIKey != "" {
-		a.Logger().Println("configuring bugsnag")
-		bugsnag.Configure(bugsnag.Configuration{
-			APIKey:       a.config.Bugsnag.APIKey,
-			ReleaseStage: a.config.Bugsnag.ReleaseStage,
-			Endpoint:     a.config.Bugsnag.Endpoint,
-			AppVersion:   Version,
-		})
-	}
-}
+*/

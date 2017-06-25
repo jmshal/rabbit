@@ -37,7 +37,7 @@ func main() {
 	}
 	app.Action = func(c *cli.Context) error {
 		configPath := c.String("config")
-		config, err := rabbit.LoadConfigFile(configPath)
+		config, err := rabbit.NewConfigFromFile(configPath)
 		if err != nil {
 			log.Fatalln(err)
 		}
