@@ -47,7 +47,7 @@ func (a *rabbit) ServeHTTP(w http.ResponseWriter, _r *http.Request) {
 	}
 
 	fwdURL := getRequestURL(r)
-	a.Log("%v <> %v %v", info.ID, r.Method, fwdURL)
+	a.Log("%v <> %v %v ... %v", info.ID, r.Method, info.URL, fwdURL)
 	defer a.Log("%v <- %v %v", info.ID, r.Method, fwdURL)
 
 	next(w, r)
