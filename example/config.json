@@ -41,6 +41,7 @@
     {
       "entrypoints": [
         {
+          "secure": true,
           "path": "/headers"
         }
       ],
