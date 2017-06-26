@@ -13,11 +13,17 @@ const (
 )
 
 type RequestInfo struct {
-	ID        string
-	URL       *url.URL
-	Websocket bool
-	Secure    bool
-	Match     *RouteMatch
+	ID          string
+	URL         *url.URL
+	ProxyURL    *url.URL
+	Websocket   bool
+	Secure      bool
+	Match       *RouteMatch
+	CachePolicy *CachePolicy
+}
+
+func (i *RequestInfo) NeedsSecureRedirect() bool {
+	return i.Match.Entrypoint.Secure && !i.Secure
 }
 
 func TagRequestInfo(r *http.Request) (*http.Request, *RequestInfo) {
