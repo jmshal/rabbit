@@ -95,6 +95,12 @@
 			"revisionTime": "2017-06-22T20:25:51Z"
 		},
 		{
+			"checksumSHA1": "c3cRGfyl0qwQH98uTdhuyqdnwm4=",
+			"path": "github.com/jmshal/go-applicationinsights/appinsights",
+			"revision": "a45e354f4e83f6c0c15b9ac64f83e0622cc21ede",
+			"revisionTime": "2017-01-31T21:34:20Z"
+		},
+		{
 			"checksumSHA1": "7/KNulGXRsKu2MMDR2LjCCZ1LKg=",
 			"path": "github.com/jmshal/wsutil",
 			"revision": "b83ce27cc066e55e4bc1fcea30e7a36baa97f169",

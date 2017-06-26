@@ -47,11 +47,11 @@ type Endpoint struct {
 }
 
 type Logging struct {
-	AppInsights *AppInsights `json:"appInsights"`
-	Bugsnag     *Bugsnag     `json:"bugsnag"`
+	ApplicationInsights *ApplicationInsights `json:"applicationInsights"`
+	Bugsnag             *Bugsnag             `json:"bugsnag"`
 }
 
-type AppInsights struct {
+type ApplicationInsights struct {
 	InstrumentationKey string `json:"instrumentationKey"`
 }
 

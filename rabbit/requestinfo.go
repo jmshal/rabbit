@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"time"
 
 	uuid "github.com/satori/go.uuid"
 )
@@ -13,13 +14,16 @@ const (
 )
 
 type RequestInfo struct {
-	ID          string
-	URL         *url.URL
-	ProxyURL    *url.URL
-	Websocket   bool
-	Secure      bool
-	Match       *RouteMatch
-	CachePolicy *CachePolicy
+	ID             string
+	URL            *url.URL
+	ProxyURL       *url.URL
+	Websocket      bool
+	Secure         bool
+	Match          *RouteMatch
+	CachePolicy    *CachePolicy
+	StartTime      time.Time
+	Duration       time.Duration
+	ResponseStatus int
 }
 
 func (i *RequestInfo) NeedsSecureRedirect() bool {
@@ -27,6 +31,7 @@ func (i *RequestInfo) NeedsSecureRedirect() bool {
 }
 
 func TagRequestInfo(r *http.Request) (*http.Request, *RequestInfo) {
+	startTime := time.Now()
 	var id string
 	// if id = r.Header.Get(RequestID); id == "" {
 	id = uuid.NewV4().String()
@@ -37,6 +42,7 @@ func TagRequestInfo(r *http.Request) (*http.Request, *RequestInfo) {
 		URL:       u,
 		Websocket: u.Scheme == "wss" || u.Scheme == "ws",
 		Secure:    r.TLS != nil,
+		StartTime: startTime,
 	}
 	c := context.WithValue(r.Context(), RequestInfoKey, m)
 	return r.WithContext(c), m

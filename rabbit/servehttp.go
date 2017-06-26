@@ -8,6 +8,8 @@ import (
 
 func (a *rabbit) ServeHTTP(w http.ResponseWriter, _r *http.Request) {
 	r, info := TagRequestInfo(_r)
+
+	defer a.AfterRequest(r)
 	defer bugsnag.AutoNotify(r)
 
 	a.Log("%v -> %v %v", info.ID, r.Method, info.URL)

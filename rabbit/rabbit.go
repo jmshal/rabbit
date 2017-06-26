@@ -6,13 +6,15 @@ import (
 	"net/http/httputil"
 
 	bugsnag "github.com/bugsnag/bugsnag-go"
+	"github.com/jmshal/go-applicationinsights/appinsights"
 	"github.com/jmshal/wsutil"
 )
 
 type rabbit struct {
-	config    *config
-	httpProxy *httputil.ReverseProxy
-	wsProxy   *wsutil.ReverseProxy
+	config              *config
+	httpProxy           *httputil.ReverseProxy
+	wsProxy             *wsutil.ReverseProxy
+	applicationInsights appinsights.TelemetryClient
 }
 
 func (a *rabbit) Log(format string, v ...interface{}) {
@@ -30,6 +32,9 @@ func (a *rabbit) setup() {
 			Endpoint:     c.Endpoint,
 			AppVersion:   Version,
 		})
+	}
+	if c := a.config.Logging.ApplicationInsights; c != nil {
+		a.applicationInsights = appinsights.NewTelemetryClient(c.InstrumentationKey)
 	}
 }
 
