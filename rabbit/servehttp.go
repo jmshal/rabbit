@@ -48,8 +48,8 @@ func (a *rabbit) ServeHTTP(w http.ResponseWriter, _r *http.Request) {
 		next = a.httpProxy.ServeHTTP
 	}
 
-	a.Log("%v >> %v %v ... %v", info.ID, r.Method, info.URL, info.ProxyURL)
-	defer a.Log("%v <- %v %v ... %v", info.ID, r.Method, info.URL, info.ProxyURL)
+	a.Log("%v >> %v %v", info.ID, r.Method, info.ProxyURL)
+	defer a.Log("%v <- %v %v", info.ID, r.Method, info.URL)
 
 	next(w, r)
 }

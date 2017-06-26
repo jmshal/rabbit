@@ -15,7 +15,7 @@ var (
 
 func (a *rabbit) modifyResponse(r *http.Response) error {
 	info := GetRequestInfo(r.Request)
-	a.Log("%v << %v %v ... %v", info.ID, r.Request.Method, info.URL, info.ProxyURL)
+	a.Log("%v << %v %v", info.ID, r.Request.Method, info.ProxyURL)
 
 	for _, header := range removeHeaders {
 		r.Header.Del(header)
