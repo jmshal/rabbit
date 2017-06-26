@@ -16,9 +16,10 @@ var (
 )
 
 type RouteMatch struct {
-	Route      *Route
-	Entrypoint *Entrypoint
-	Endpoint   *Endpoint
+	Route        *Route
+	Entrypoint   *Entrypoint
+	Endpoint     *Endpoint
+	TrailingPath string
 }
 
 func (a *rabbit) MatchRoute(r *http.Request) (*RouteMatch, error) {
@@ -61,10 +62,14 @@ func (a *rabbit) MatchRoute(r *http.Request) (*RouteMatch, error) {
 				return nil, ErrorWebsocketsNotAllowed
 			}
 
+			trailingPath := strings.TrimPrefix(r.URL.Path, entrypoint.Path)
+			trailingPath = "/" + strings.TrimLeft(trailingPath, "/")
+
 			return &RouteMatch{
-				Route:      route,
-				Entrypoint: entrypoint,
-				Endpoint:   route.Endpoints[0], // TODO lb
+				Route:        route,
+				Entrypoint:   entrypoint,
+				Endpoint:     route.Endpoints[0], // TODO lb
+				TrailingPath: trailingPath,
 			}, nil
 		}
 	}

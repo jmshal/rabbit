@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 )
 
 const (
@@ -53,15 +52,12 @@ func (a *rabbit) ModifyRequest(r *http.Request) error {
 		r.URL.Host += fmt.Sprintf(":%v", endpoint.Port)
 	}
 
-	parts := []string{
-		endpoint.Path, // start with the endpoint path
-		strings.TrimPrefix(r.URL.Path, info.Match.Entrypoint.Path), // add the unprefixed entrypoint path
-	}
 	var path string
-	for _, part := range parts {
-		if part != "" && part != "/" {
-			path += "/" + strings.TrimLeft(part, "/")
-		}
+	if endpoint.Path != "" {
+		path += endpoint.Path
+	}
+	if info.Match.TrailingPath != "/" {
+		path += info.Match.TrailingPath
 	}
 	if path == "" {
 		path = "/"
